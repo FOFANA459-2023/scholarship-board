@@ -47,9 +47,6 @@ function Navbar() {
             <Link to="/" className="text-white hover:text-blue-300">
               Home
             </Link>
-            <Link to="/about" className="text-white hover:text-blue-300">
-              About
-            </Link>
             <Link to="/scholarship-list" className="text-white hover:text-blue-300">
               Scholarships
             </Link>

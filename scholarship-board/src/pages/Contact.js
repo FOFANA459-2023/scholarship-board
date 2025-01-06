@@ -10,6 +10,7 @@ function Contact() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -40,12 +41,19 @@ function Contact() {
     if (!validateForm()) return; // Stop if validation fails
 
     setIsSubmitting(true);
+    setSubmitError("");
 
     try {
-      // Insert data into Supabase
+      // Insert data into Supabase (only name, email, and message)
       const { data, error } = await supabase
         .from("contact")
-        .insert([formData])
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+          },
+        ])
         .select();
 
       if (error) throw error;
@@ -55,87 +63,117 @@ function Contact() {
       setErrors({}); // Clear errors
     } catch (error) {
       console.error("Error submitting form:", error.message);
-      setErrors({ submit: "Failed to submit form. Please try again." });
+      setSubmitError("Failed to submit form. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-900">
-        Contact Us
-      </h2>
-      {submitSuccess && (
-        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-          Message sent successfully!
+    <div>
+      <section id="contact" className="bg-white text-blue-900 py-16">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-4">Contact Us</h2>
+          <p className="text-lg text-center text-blue-700 mb-8">
+            Have questions or need support? We're here to help! Reach out to us,
+            and we'll get back to you as soon as possible.
+          </p>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gradient-to-br from-blue-900 to-red-800 p-1 rounded-lg shadow-xl">
+              <div className="bg-white p-8 rounded-lg">
+                {submitSuccess && (
+                  <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                    Message submitted successfully! An admin will reach out to
+                    you shortly.
+                  </div>
+                )}
+                {submitError && (
+                  <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                    {submitError}
+                  </div>
+                )}
+                <form onSubmit={handleSubmit} noValidate>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-blue-900 mb-2"
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      placeholder="Enter your name"
+                      required
+                    />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    )}
+                  </div>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-blue-900 mb-2"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      placeholder="Enter your email"
+                      required
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-blue-900 mb-2"
+                    >
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      rows="5"
+                      className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      placeholder="Your message..."
+                      required
+                    />
+                    {errors.message && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.message}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-blue-600 to-red-600 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-      {errors.submit && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          {errors.submit}
-        </div>
-      )}
-      <form onSubmit={handleSubmit} noValidate>
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
-        </div>
-        <div className="mb-6">
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            value={formData.message}
-            onChange={handleInputChange}
-            rows="4"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-          {errors.message && (
-            <p className="text-red-500 text-sm mt-1">{errors.message}</p>
-          )}
-        </div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
-      </form>
+      </section>
+      ;
     </div>
   );
 }

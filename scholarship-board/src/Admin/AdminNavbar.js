@@ -61,7 +61,7 @@ function AdminNavbar() {
               Manage Scholarships
             </Link>
             <Link to="./post-scholarship" className="text-white hover:text-blue-300">
-              Post Scholarship
+              Upload Scholarship
             </Link>
             {isLoggedIn && (
               <button
@@ -90,7 +90,7 @@ function AdminNavbar() {
               className="block py-2 text-white hover:text-blue-300"
               onClick={toggleMenu}
             >
-              Post Scholarship
+              Upload Scholarship
             </Link>
             {isLoggedIn && (
               <button

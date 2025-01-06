@@ -75,20 +75,30 @@ const AdminScholarshipList = () => {
   // Handle scholarship deletion
   const handleDelete = async (id) => {
     try {
+      console.log("Deleting scholarship with ID:", id); // Debugging log
+
+      // Perform the delete operation in Supabase
       const { error } = await supabase
         .from("scholarships")
         .delete()
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        throw error; // Throw the error if the deletion fails
+      }
+
+      // Update the local state only if the deletion is successful
       setScholarships((prev) =>
         prev.filter((scholarship) => scholarship.id !== id)
       );
       setFilteredScholarships((prev) =>
         prev.filter((scholarship) => scholarship.id !== id)
       );
+
+      console.log("Scholarship deleted successfully:", id); // Debugging log
     } catch (error) {
-      console.error("Error deleting scholarship:", error);
+      console.error("Error deleting scholarship:", error); // Log the error
+      alert("Failed to delete scholarship. Please try again."); // Notify the user
     }
   };
 
